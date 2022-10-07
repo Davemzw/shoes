@@ -1,26 +1,40 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <Header v-if="!$route.meta.Logining"></Header>
+    <HeaderTop v-else></HeaderTop>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive"></router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
+    <Footer />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import Header from "./components/Header.vue";
+import Footer from "./components/Footer.vue";
+import HeaderTop from "./components/HeaderTop.vue";
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    Header,
+    Footer,
+    HeaderTop,
+  },
+  data() {
+    return {
+      num: 1,
+    };
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+  background-color: #f2f2f2;
+}
+.w {
+  width: 1200px;
+  margin: 0 auto;
 }
 </style>
