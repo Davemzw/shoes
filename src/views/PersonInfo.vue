@@ -68,6 +68,24 @@ export default {
     });
   },
   methods: {
+    save(){
+      if(this.user.userId&&this.user.nickname&&this.user.phone&&this.user.eMail){
+      axios.put("/user/info",{
+        userId:this.user.userId,
+        username:this.user.username,
+        nickname:this.user.nickname,
+        phone:this.user.phone,
+        eMail:this.user.eMail
+      }).then((res)=>{
+        console.log(res);
+        if(res.flag){
+          alert("修改成功")
+        }
+      })
+    }else{
+      alert("输入的信息不完整")
+    }
+    },
     chooseavatar() {
       this.$refs.picture.click();
     },

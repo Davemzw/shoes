@@ -44,29 +44,37 @@ export default {
     return {
       nav1: [
         "全部订单",
-        "未付款",
-        "已付款",
-        "已发货",
+        "待付款",
+        "待发货",
+        "运输中",
+        "待收货",
         "已收货",
-        "退货中",
-        "已取消",
+        "退款中",
+        "已退款"
       ],
       nav2: ["个人信息", "密码修改", "收货地址"],
-      title: "全部订单",
+      title: "",
     };
   },
   mounted() {
-    this.title = this.$route.meta.item;
+    // this.title = this.$route.meta.item;
+    this.title=localStorage.getItem('liname')
+  },
+  beforeUnmount(){
+    localStorage.setItem('liname',"全部订单")
   },
   methods: {
     goOrderList(e) {
       this.check(e.target.dataset.liname);
+      const index=this.nav1.indexOf(e.target.dataset.liname)
       this.$router.push({
         name: "orderlist",
         query: {
           title: this.title,
+          index:index
         },
       });
+      localStorage.setItem("liname",e.target.dataset.liname)
     },
     goPersonInfo() {
       this.check("个人信息");

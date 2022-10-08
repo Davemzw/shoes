@@ -37,7 +37,7 @@
           <span class="shop-sum"
             >{{ item.shoes[0].price * item.shoesNumber }}元</span
           >
-          <span class="shop-action">x</span>
+          <span class="shop-action" @click="delShoe" :data-cart="item.cartId">x</span>
         </li>
       </ul>
     </div>
@@ -88,6 +88,24 @@ export default {
     },
   },
   methods: {
+    delShoe(e){
+      axios({
+        method:"delete",
+        url:"/user/cart?cartId="+Number(e.target.dataset.cart)
+      }).then((res)=>{
+        console.log(res);
+        if(res.flag){
+          console.log(111300);
+          this.shopList=this.shopList.filter((item)=>{
+              return item.cartId!=res.data
+           })
+           console.log(this.shopList);
+           this.$router.go(0)
+        }else{
+          alert("删除失败，请检查你的网络")
+        }
+      })
+    },
     choose(e) {
       console.log(e.target.dataset.index);
       const index = e.target.dataset.index;

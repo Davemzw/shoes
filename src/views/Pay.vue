@@ -22,7 +22,7 @@
         </div>
         <div class="order-detail">
           <div class="order-id">
-            订单号:&nbsp;&nbsp;&nbsp;<strong>123456789</strong>
+            订单号:&nbsp;&nbsp;&nbsp;<strong>{{Order.orderId}}</strong>
           </div>
           <div class="detail-info">
             收货信息:&nbsp;&nbsp;mzw广东省汕头市潮南区成田镇家美家一村
@@ -69,6 +69,9 @@ export default {
       Order: {},
     };
   },
+  beforeMount(){
+    this.Order=JSON.parse(localStorage.getItem("Order"))
+  },
   methods: {
     countdown() {
       if (this.msec < 0) return;
@@ -93,7 +96,7 @@ export default {
       order.status = 1;
       order.payMethod = "微信支付";
       axios
-        .post("/user/order", {
+        .post("/user/order/payment", {
           Order: order,
         })
         .then((res) => {

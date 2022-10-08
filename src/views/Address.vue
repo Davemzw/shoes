@@ -17,12 +17,12 @@
           }}
         </p>
         <div>
-          <span>删除</span>
+          <span @click="delAddress" :data-index="address.userAddressId">删除</span>
           <span @click="EditAddress(address)">修改</span>
         </div>
       </div>
       <div class="add-address">
-        <div @click="toggleShow">+</div>
+        <div @click="addAddress">+</div>
       </div>
     </div>
     <div class="popContainer" v-if="isShow"></div>
@@ -34,19 +34,22 @@
       <div class="shop-address">
         <select v-model="province">
           <option selected disabled>请选择省份</option>
+          <option v-for="province in map" :key="province.mapId">{{province.addressName}}</option>
         </select>
         <select v-model="city">
           <option selected disabled>请选择城市</option>
+          <option v-for="city in cityList" :key="city.mapId">{{city.addressName}}</option>
         </select>
         <select v-model="area">
           <option selected disabled>请选择区/县</option>
+          <option v-for="area in areaList" :key="area.mapId">{{area.addressName}}</option>
         </select>
       </div>
       <div class="detail-address">
         <input type="text" placeholder="详细地址" v-model="detail" />
       </div>
       <div class="btn-box">
-        <button style="background-color: orange">确定</button>
+        <button style="background-color: orange" @click="changeOrAdd">确定</button>
         <button style="background-color: #888" @click="toggleShow">取消</button>
       </div>
     </div>
@@ -68,16 +71,107 @@ export default {
       person: "",
       phone: "",
       detail: "",
+      addressId:"",
+      map:[],
+      cityList:[],
+      areaList:[],
+      addOrEdit:false
     };
+  },
+  watch:{
+    province(newVal){
+      this.map.forEach((item)=>{
+        if(item.addressName===newVal){
+          this.cityList=item.children
+          this.city=item.children[0].addressName
+        }
+      })
+    },
+    city:{
+      handler(newVal){
+      this.cityList.forEach((item)=>{
+        
+        if(item.addressName===newVal){
+         this.areaList=item.children
+         this.area=item.children[0].addressName
+        }
+      })
+    },
+    immediate:true
+  }
   },
   beforeMount() {
     const userId = JSON.parse(localStorage.getItem("user")).userId;
     axios.get("/user/address?userId=" + userId).then((res) => {
       console.log(res);
-      this.addressList = res.data.records;
+      this.addressList = res.data.records.filter((item)=>{
+        return item.status==="1"
+      });
     });
+    axios.get("/user/address/map").then((res)=>{
+      console.log(res);
+      this.map=res.data[0].children
+    })
   },
   methods: {
+    delAddress(e){
+      const addressId=Number(e.target.dataset.index);
+      axios.delete("/user/address?addressId="+addressId).then((res)=>{
+        console.log(res);
+        if(res.flag){
+          this.$router.go(0)
+        }
+      })
+    },
+    changeOrAdd(){
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
+      if(this.addOrEdit){
+        axios.post("/user/address",{
+          userId:userId,
+          addressProvince:this.province,
+          addressCity:this.city,
+          area:this.area,
+          status:1,
+          addressDetail:this.detail,
+          phone:this.phone,
+          consignee:this.person
+        }).then((res)=>{
+          console.log(res);
+          if(res.flag){
+            this.toggleShow()
+            this.$router.go(0)
+          }
+        })
+      }else{
+        axios.put("/user/address",{
+          userAddressId:this.addressId,
+          userId:userId,
+          addressProvince:this.province,
+          addressCity:this.city,
+          area:this.area,
+          // status:1,
+          addressDetail:this.detail,
+          phone:this.phone,
+          consignee:this.person
+        }).then((res)=>{
+          console.log(res);
+          if(res.flag){
+            this.toggleShow()
+            this.$router.go(0)
+          }
+        })
+      }
+    },
+    addAddress(){
+      this.addOrEdit=true
+      this.toggleShow();
+      this.province="请选择省份";
+      this.city="请选择城市";
+      this.area="请选择区/县";
+      this.person="";
+      this.phone="";
+      this.detail="";
+    },
     onChangeProvince(a) {
       this.province = a.value;
     },
@@ -91,6 +185,7 @@ export default {
       this.isShow = !this.isShow;
     },
     EditAddress(address) {
+      this.addOrEdit=false
       this.toggleShow();
       this.province = address.addressProvince;
       this.city = address.addressCity;
@@ -98,6 +193,7 @@ export default {
       this.person = address.consignee;
       this.phone = address.phone;
       this.detail = address.addressDetail;
+      this.addressId=address.userAddressId
     },
   },
 };

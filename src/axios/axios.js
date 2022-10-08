@@ -4,7 +4,7 @@
 import axios from "axios";
 // axios默认配置
 axios.defaults.timeout = 10 * 60000; // 超时时间 1分钟
-axios.defaults.baseURL = "http://192.168.147.1:8088"; // 默认请求地址的前缀，如：/api/login => http://localhost:8081/api/login
+axios.defaults.baseURL = "http://192.168.137.1:8088"; // 默认请求地址的前缀，如：/api/login => http://localhost:8081/api/login
 // 格式化数据，将请求参数转化成 json 字符串
 // axios.defaults.transformRequest = function (data) {
 //   return JSON.stringify(data);

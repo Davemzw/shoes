@@ -137,16 +137,18 @@ export default {
     search(e) {
       const item = e.target.dataset;
       if (item.size) {
-        this.current.sizes = item.size;
+        this.current.sizes = this.current.sizes === item.size ? " " : item.size;
       }
       if (item.type) {
-        this.current.type = item.type;
+        this.current.type = this.current.type === item.type ? " " : item.type;
       }
       if (item.color) {
-        this.current.color = item.color;
+        this.current.color =
+          this.current.color === item.color ? " " : item.color;
       }
       if (item.brand) {
-        this.current.brandName = item.brand;
+        this.current.brandName =
+          this.current.brandName === item.brand ? " " : item.brand;
       }
       this.current.currentPage = 1;
       axios.post("/index/shoes/like", this.current).then((res) => {

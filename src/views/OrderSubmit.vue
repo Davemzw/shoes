@@ -6,23 +6,23 @@
         <div
           class="address-item"
           v-for="address in addressList"
-          :key="address.addressId"
+          :key="address.userAddressId"
           @click="chooseAddress"
-          :data-address="address.addressId"
-          :class="[{ active: address.addressId == addressId }]"
+          :data-address="address.userAddressId"
+          :class="[{ active: address.userAddressId == addressId }]"
         >
-          <div class="name" :data-address="address.addressId">
+          <div class="name" :data-address="address.userAddressId">
             {{ address.consignee }}
           </div>
-          <div class="phone" :data-address="address.addressId">
+          <div class="phone" :data-address="address.userAddressId">
             {{ address.phone }}
           </div>
-          <p class="harvest-address" :data-address="address.addressId">
+          <p class="harvest-address" :data-address="address.userAddressId">
             {{ address.addressProvince }}&nbsp;{{ address.addressCity }}&nbsp;{{
               address.area
             }}&nbsp;{{ address.addressDetail }}
           </p>
-          <span @click="changeaddress" :data-index="10">修改</span>
+          <span @click="changeaddress(address)">修改</span>
         </div>
         <div class="add-address">
           <div @click="addnewaddress">+</div>
@@ -78,11 +78,18 @@
         <input type="text" placeholder="手机号码" v-model="phone" />
       </div>
       <div class="shop-address">
-        <v-distpicker
-          @province="onChangeProvince"
-          @city="onChangeCity"
-          @area="onChangeArea"
-        ></v-distpicker>
+        <select v-model="province">
+          <option selected disabled>请选择省份</option>
+          <option v-for="province in map" :key="province.mapId">{{province.addressName}}</option>
+        </select>
+        <select v-model="city">
+          <option selected disabled>请选择城市</option>
+          <option v-for="city in cityList" :key="city.mapId">{{city.addressName}}</option>
+        </select>
+        <select v-model="area">
+          <option selected disabled>请选择区/县</option>
+          <option v-for="area in areaList" :key="area.mapId">{{area.addressName}}</option>
+        </select>
       </div>
       <div class="detail-address">
         <input type="text" placeholder="详细地址" v-model="detail" />
@@ -113,7 +120,32 @@ export default {
       isAdd: true,
       shopList: [],
       addressId: "",
+      map:[],
+      cityList:[],
+      areaList:[]
     };
+  },
+  watch:{
+    province(newVal){
+      this.map.forEach((item)=>{
+        if(item.addressName===newVal){
+          this.cityList=item.children
+          this.city=item.children[0].addressName
+        }
+      })
+    },
+    city:{
+      handler(newVal){
+      this.cityList.forEach((item)=>{
+        
+        if(item.addressName===newVal){
+         this.areaList=item.children
+         this.area=item.children[0].addressName
+        }
+      })
+    },
+    immediate:true
+  }
   },
   beforeMount() {
     const userId = JSON.parse(localStorage.getItem("user")).userId;
@@ -121,6 +153,10 @@ export default {
       console.log(res);
       this.addressList = res.data.records;
     });
+    axios.get("/user/address/map").then((res)=>{
+      console.log(res);
+      this.map=res.data[0].children
+    })
     if (this.$route.query.name) {
       this.shopList.push(this.$route.query);
     } else {
@@ -161,10 +197,15 @@ export default {
       console.log(e.target.dataset.address);
       this.addressId = e.target.dataset.address;
     },
-    changeaddress(e) {
+    changeaddress(address) {
       this.isAdd = false;
       this.toggleShow();
-      console.log(e.target.dataset.index);
+      this.province=address.addressProvince;
+      this.city=address.addressCity;
+      this.area=address.area;
+      this.detail=address.addressDetail;
+      this.phone=address.phone;
+      this.person=address.consignee;
     },
     addnewaddress() {
       this.isAdd = true;
@@ -187,7 +228,7 @@ export default {
     },
     submitorder() {
       axios
-        .post("/user/order", {
+        .post("/user/order/generate", {
           Order: {
             userId: JSON.parse(localStorage.getItem("user")).userId,
             price: this.sum,
@@ -199,7 +240,7 @@ export default {
         .then((res) => {
           console.log(res);
           if (res.flag) {
-            localStorage.setItem("Order", JSON.stringify(res.data.Order));
+            localStorage.setItem("Order", JSON.stringify(res.data));
             this.$router.push("/pay");
           }
         });
@@ -250,6 +291,12 @@ export default {
   margin-bottom: 10px;
   padding: 10px 15px;
   border: 1px solid orange;
+}
+.shop-address select {
+  display: inline-block;
+  width: 177px;
+  height: 38px;
+  border: 1px solid #888;
 }
 .address-item * {
   margin-bottom: 25px;

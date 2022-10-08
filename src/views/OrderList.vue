@@ -70,11 +70,25 @@ export default {
     const userId = JSON.parse(localStorage.getItem("user")).userId;
     axios.get("/user/order?userId=" + userId).then((res) => {
       console.log(res);
+      if(this.$route.query.index==="0"){
       this.orderList = res.data.records;
+    }else{
+      this.orderList=res.data.records.filter((item)=>{
+        return item.status===(Number(this.$route.query.index)-1)
+      })
+    }
     });
   },
   mounted() {
     console.log(this.$route.query.title);
+  },
+  watch:{
+    $route:{
+      handler(){
+         this.$router.go(0)
+      },
+      deep:true
+    }
   },
   methods: {
     goDetail(e) {
