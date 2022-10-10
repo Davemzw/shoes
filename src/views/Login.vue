@@ -63,7 +63,7 @@ export default {
   position: relative;
   width: 100%;
   height: 600px;
-  background-image: url("https://img.zcool.cn/community/01348b5aded97da80120927b3a442f.jpg@1280w_1l_2o_100sh.jpg");
+  background-image: url("https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01762957202bc26ac72538128e031c.jpg%401280w_1l_2o_100sh.png&refer=http%3A%2F%2Fimg.zcool.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1667979068&t=f03e2e56308fe8ea92d65bc619b418d0");
   background-size: 100% 100%;
 }
 .login-box {

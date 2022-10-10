@@ -92,7 +92,7 @@ export default {
         "彩色",
         "灰色",
       ],
-      brandList: ["耐克", "阿迪达斯", "鸿星尔克", "匡威", "李宁", "彪马"],
+      brandList: ["耐克", "阿迪达斯", "鸿星尔克", "匡威", "李宁", "彪马","安踏"],
       typeList: [
         "足球鞋",
         "运动鞋",
@@ -112,7 +112,7 @@ export default {
     if (this.$route.query.keyword) {
       const keyword = this.$route.query.keyword;
       axios
-        .post("http://192.168.3.140:8088/index/shoes/search", {
+        .post("/index/shoes/search", {
           type: keyword,
           name: keyword,
           details: keyword,

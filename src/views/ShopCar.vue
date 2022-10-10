@@ -30,9 +30,9 @@
             item.shoes[0].price
           }}</span>
           <span class="shop-count">
-            <button @click="item.shoesNumber++">+</button>
-            <input type="text" v-model="item.shoesNumber" />
             <button @click="item.shoesNumber--">-</button>
+            <input type="text" v-model="item.shoesNumber" />
+            <button @click="item.shoesNumber++">+</button>
           </span>
           <span class="shop-sum"
             >{{ item.shoes[0].price * item.shoesNumber }}元</span

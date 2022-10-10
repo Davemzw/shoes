@@ -159,9 +159,11 @@ export default {
     })
     if (this.$route.query.name) {
       this.shopList.push(this.$route.query);
+      localStorage.setItem('orderInfo',JSON.stringify(this.shopList))
     } else {
       this.shopList = JSON.parse(localStorage.getItem("cartOrder"));
       console.log(this.shopList);
+      localStorage.setItem('orderInfo',JSON.stringify(this.shopList))
     }
   },
   computed: {
@@ -187,15 +189,59 @@ export default {
   },
   methods: {
     submitaddress() {
+      const userId = JSON.parse(localStorage.getItem("user")).userId;
       if (this.isAdd) {
         console.log("我在添加新的地址");
+        axios.post("/user/address",{
+          userId:userId,
+          addressProvince:this.province,
+          addressCity:this.city,
+          area:this.area,
+          status:1,
+          addressDetail:this.detail,
+          phone:this.phone,
+          consignee:this.person
+        }).then((res)=>{
+          console.log(res);
+          if(res.flag){
+            this.toggleShow()
+            this.$router.go(0)
+          }
+        })
       } else {
         console.log("我在修改已有的地址");
+        axios.put("/user/address",{
+          userAddressId:this.addressId,
+          userId:userId,
+          addressProvince:this.province,
+          addressCity:this.city,
+          area:this.area,
+          // status:1,
+          addressDetail:this.detail,
+          phone:this.phone,
+          consignee:this.person
+        }).then((res)=>{
+          console.log(res);
+          if(res.flag){
+            this.toggleShow()
+            this.$router.go(0)
+          }
+        })
       }
     },
     chooseAddress(e) {
       console.log(e.target.dataset.address);
-      this.addressId = e.target.dataset.address;
+      if(e.target.dataset.address){
+      this.addressId = Number(e.target.dataset.address);
+      this.addressList.forEach((item)=>{
+        if(item.userAddressId===this.addressId){
+        localStorage.setItem('orderperson',JSON.stringify(item))
+        }
+      })
+    }
+      else{
+        return;
+      }
     },
     changeaddress(address) {
       this.isAdd = false;
@@ -206,6 +252,7 @@ export default {
       this.detail=address.addressDetail;
       this.phone=address.phone;
       this.person=address.consignee;
+      this.addressId=address.userAddressId
     },
     addnewaddress() {
       this.isAdd = true;
@@ -235,6 +282,7 @@ export default {
             addressId: this.addressId,
             status: 0,
             Shoes: this.shoes,
+            shoess:[],
           },
         })
         .then((res) => {

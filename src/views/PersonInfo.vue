@@ -79,7 +79,9 @@ export default {
       }).then((res)=>{
         console.log(res);
         if(res.flag){
+          localStorage.setItem('user',JSON.stringify(res.data))
           alert("修改成功")
+
         }
       })
     }else{

@@ -9,13 +9,13 @@
       <div class="s-title" style="color: orange">下单成功</div>
       <div class="state">
         <ul>
-          <li>未付款</li>
-          <li class="live">已付款</li>
-          <li>已发货</li>
-          <li>已收货</li>
-          <li>退货中</li>
-          <li>已退货</li>
-          <li>已取消</li>
+          <li :class="[{'live':live===0}]">待付款</li>
+          <li :class="[{'live':live===1}]">待发货</li>
+          <li :class="[{'live':live===2}]">运输中</li>
+          <li :class="[{'live':live===3}]">待收货</li>
+          <li :class="[{'live':live===4}]">已收货</li>
+          <li :class="[{'live':live===5}]">退款中</li>
+          <li :class="[{'live':live===6}]">已退款</li>
         </ul>
       </div>
       <div class="order-good" v-for="item in shoesList" :key="item">
@@ -69,11 +69,13 @@ export default {
       orderInfo: {},
       shoesList: [],
       addressInfo: {},
+      live:"",
     };
   },
   methods: {
     returnList() {
-      this.$router.push("/person/orderlist");
+      // this.$router.push("/person/orderlist");
+      this.$router.back();
     },
   },
   beforeMount() {
@@ -84,6 +86,7 @@ export default {
         this.orderInfo = res.data.records[0];
         this.shoesList = res.data.records[0].shoes;
         this.addressInfo = res.data.records[0].address;
+        this.live=res.data.records[0].status
       });
   },
 };

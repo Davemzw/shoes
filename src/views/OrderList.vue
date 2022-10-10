@@ -11,7 +11,7 @@
         <div class="box1">
           <span style="font-size: 18px; color: orange">下单成功</span>
           <div class="order-info">
-            <span class="order-time">2022-9-19 14:33:01</span>
+            <span class="order-time">{{order.createTime}}</span>
             <span class="order-id">订单号:{{ order.orderId }}</span>
             <span class="order-pay"
               >应付金额：<i style="font-size: 28px">{{ order.price }}</i
@@ -71,7 +71,9 @@ export default {
     axios.get("/user/order?userId=" + userId).then((res) => {
       console.log(res);
       if(this.$route.query.index==="0"){
-      this.orderList = res.data.records;
+      this.orderList = res.data.records.reverse().filter((item)=>{
+        return item.status!==0
+      });
     }else{
       this.orderList=res.data.records.filter((item)=>{
         return item.status===(Number(this.$route.query.index)-1)

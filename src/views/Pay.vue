@@ -9,7 +9,7 @@
             <span
               >应付金额:<strong
                 style="font-size: 20px; color: orange; margin-left: 10px"
-                >899元</strong
+                >{{Order.price}}元</strong
               >
             </span>
             <div
@@ -25,10 +25,10 @@
             订单号:&nbsp;&nbsp;&nbsp;<strong>{{Order.orderId}}</strong>
           </div>
           <div class="detail-info">
-            收货信息:&nbsp;&nbsp;mzw广东省汕头市潮南区成田镇家美家一村
+            收货信息:&nbsp;&nbsp;<strong>{{orderPerson.consignee}}</strong> {{orderPerson.addressProvince+orderPerson.addressCity+orderPerson.area+orderPerson.addressDetail}}
           </div>
           <div class="order-name">
-            商品名:&nbsp;&nbsp;&nbsp;小罗足球鞋-1&nbsp;43码
+            商品名:&nbsp;&nbsp;&nbsp;{{shopinfo[0].name}}-{{shopinfo[0].count}}&nbsp;{{shopinfo[0].size}}码{{shopinfo.length==1?'':"..."}}
           </div>
         </div>
       </div>
@@ -39,20 +39,20 @@
         <strong style="font-size: 16px; font-weight: 600">支付平台</strong>
       </div>
       <div class="pay-method">
-        <button class="iconfont">
+        <button class="iconfont" @click="choosepay(0)" :class="[{payactive:payMethod==='支付宝'}]">
           &#xe68a;<i style="font-size: 18px; font-weight: 600">支付宝</i>
         </button>
-        <button class="iconfont">
+        <button class="iconfont" @click="choosepay(1)" :class="[{payactive:payMethod==='微信支付'}]">
           &#xe607;<i style="font-size: 18px; font-weight: 600">微信支付</i>
         </button>
         <span class="count-down"
           >剩余时间:
-          <i style="font-size: 18px; color: orange">{{ min }}分{{ sec }}秒</i>
+          <i style="font-size: 18px; color: orange">{{msec<0?"已超时":min+'分'+sec+'秒'}}</i>
         </span>
       </div>
 
       <div class="submit-btn">
-        <button @click="goPay">确认支付</button>
+        <button @click="goPay" :disabled="!msec">确认支付</button>
       </div>
     </div>
   </div>
@@ -65,12 +65,18 @@ export default {
     return {
       min: "",
       sec: "",
-      msec: 900,
+      msec: "",
       Order: {},
+      shopinfo:[],
+      orderPerson:{},
+      payMethod:""
     };
   },
   beforeMount(){
     this.Order=JSON.parse(localStorage.getItem("Order"))
+    this.shopinfo=JSON.parse(localStorage.getItem('orderInfo'))
+    this.orderPerson=JSON.parse(localStorage.getItem('orderperson'))
+    this.msec=new Date(this.Order.createTime).getTime()/1000+900-new Date(Date.now()).getTime()/1000; 
   },
   methods: {
     countdown() {
@@ -91,10 +97,17 @@ export default {
         }, 1000);
       }
     },
+    choosepay(flag){
+        if(flag===0){
+          this.payMethod="支付宝"
+        }else{
+          this.payMethod="微信支付"
+        }
+    },
     goPay() {
       const order = JSON.parse(localStorage.getItem("Order"));
       order.status = 1;
-      order.payMethod = "微信支付";
+      order.payMethod = this.payMethod;
       axios
         .post("/user/order/payment", {
           Order: order,
@@ -102,6 +115,7 @@ export default {
         .then((res) => {
           console.log(res);
           if (res.flag) {
+            alert('支付成功');
             this.$router.push("/person/orderlist");
           }
         });
@@ -121,6 +135,9 @@ export default {
   justify-content: center;
   align-items: center;
   margin-top: 40px;
+}
+.payactive{
+  background-color: orange !important;
 }
 .order-info {
   display: flex;

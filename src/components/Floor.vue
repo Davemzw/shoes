@@ -49,7 +49,19 @@ export default {
     };
   },
   beforeMount() {
-    axios.get("/index").then((res) => {
+    let Min=10000;
+    let Max=999999;
+    let Range =Max - Min;
+    let Rand = Math.random();
+    let userkey;
+    if(localStorage.getItem('userkey')){
+        userkey=Number(localStorage.getItem('userkey'))
+    }
+    else{userkey=Min + Math.round(Rand * Range)
+    localStorage.setItem('userkey',userkey)
+    } 
+    
+    axios.get("/index?userKey="+userkey).then((res) => {
       console.log(res);
       this.goodList = res.data.records;
     });
